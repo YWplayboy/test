@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+					    http://www.springframework.org/schema/beans/spring-beans.xsd
+					    http://www.springframework.org/schema/context
+					    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+					    http://www.springframework.org/schema/tx
+					    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+					    http://www.springframework.org/schema/aop
+					    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<!-- 自动扫描 -->
+	<context:component-scan base-package="com.**.services" />
+	
+	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+	</bean>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc_driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc_url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc_username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc_password}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc_minPoolSize}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc_maxPoolSize}</value>
+		</property>
+		<property name="initialPoolSize">
+			<value>${jdbc_initialPoolSize}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc_maxIdleTime}</value>
+		</property>
+		<property name="acquireIncrement">
+			<value>${jdbc_acquireIncrement}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc_idleConnectionTestPeriod}</value>
+		</property>
+		<property name="preferredTestQuery" value="${jdbc_preferredTestQuery}"></property>
+		<property name="testConnectionOnCheckin" value="${jdbc_testConnectionOnCheckin}"></property>
+		<property name="testConnectionOnCheckout" value="${jdbc_testConnectionOnCheckout}"></property>
+		<property name="acquireRetryAttempts">
+			<value>${jdbc_acquireRetryAttempts}</value>
+		</property>
+	</bean>
+
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- (事务管理) -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 使用自动扫描包的方式来注册各种Mapper ，配置如下： -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.**.dao" />
+	</bean>
+	
+	<!-- 注解方式配置事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+</beans>  

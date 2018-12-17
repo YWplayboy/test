@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.car.admin.dao.UserMapper">
+    <resultMap id="seeUser" type="com.car.admin.empty.User">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="is_admin" property="isAdmin" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <select id="findById" parameterType="java.lang.String" resultMap="seeUser">
+        SELECT * FROM c_user WHERE id=#{id}
+    </select>
+
+    <select id="login" parameterType="java.lang.String" resultMap="seeUser">
+        SELECT * FROM c_user WHERE login_id=#{loginId}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String">
+        DELETE FROM c_user WHERE id=#{id}
+    </delete>
+
+    <insert id="add" parameterType="com.car.admin.empty.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO c_user(login_id,password,name,create_time,is_admin)
+        VALUES #{loginId},#{password},#{name},#{createTime},#{isAdmin}
+    </insert>
+
+    <update id="update" parameterType="com.car.admin.empty.User">
+        UPDATE c_user SET password=#{password}, name=#{name} WHERE id=#{id}
+    </update>
+
+    <select id="findAll" resultMap="seeUser">
+         SELECT * FROM c_user
+    </select>
+</mapper>
